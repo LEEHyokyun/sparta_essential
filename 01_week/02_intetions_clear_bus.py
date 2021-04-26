@@ -6,7 +6,7 @@
 
 
 #AS IS
-def func(obj, var):
+def ride_bus(obj, var):
     # 버스가 만석인지 확인합니다.
     # 버스가 만석이라면 함수를 종료하고, 그렇지 않다면 유저가 해당 버스에 탑승합니다.
     if obj.check():
