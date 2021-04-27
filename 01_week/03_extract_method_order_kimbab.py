@@ -39,14 +39,14 @@ def order_kimbob(cook, ingredients):
 
 #TO BE
 def order_kimbob(cook, ingredients):
-    if not ingredients.is_empty():
-        prepare_base_ingredients(cook, ingredients) #재료준비 속성 메소드를 모두 하나의 함수로 축약
-
-        kimbob = make_kimbob(cook, ingredients)
-
-        return prepare_plating(cook, kimbob)
-    else:
+    if ingredients.is_empty():
         return None
+    
+    #if 조건문이 단순 boolean 문일때(단순조건), else 생략가능
+    prepare_base_ingredients(cook, ingredients)  # 재료준비 속성 메소드를 모두 하나의 함수로 축약
+    kimbob = make_kimbob(cook, ingredients)
+    return prepare_plating(cook, kimbob)
+
 
 
 def prepare_base_ingredients(cook, ingredients):
