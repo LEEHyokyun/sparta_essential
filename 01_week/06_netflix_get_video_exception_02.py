@@ -24,8 +24,9 @@ class MustHaveLicenseError(Exception): #예외 개별 클래스화
 def display_video(video, user):
     try:
         video = get_video(video, user)
-    except
-        MustHaveLicenseError:
+    except Exception as e:
+        if e.args[0] == "사용권이 있어야만 볼 수 있습니다":
+            pass #사용권 구매 페이지로 이동하는 로직
         ...#예외 개별클래스를 사용하여 이에 대한 동작을 처리하도록 설정
 
 
