@@ -51,32 +51,41 @@ def get_result(order_histories, cartoon_info):
     result = ""
 
     for order_history in order_histories:
-        result += f"{order_history['customer']} 주문 내역\n"
+        result += f"{order_history['customer']} 주문 내역\n" #출력결과 추가하기
         #print(result)
-        total_amount = 0
-        point = 0
+        total_amount = 0  #총비용 계산하기
+        point = 0 #포인트 계산하기
 
-        for cartoon_consumption_history in order_history["cartoon_consumption_histories"]:
-            amount = 0
-            cartoon = cartoon_info[cartoon_consumption_history["cartoon_id"]]
-            if cartoon["genre"] == "판타지":
-                amount += 1000 * (cartoon_consumption_history["view_count"] - 30)
-            elif cartoon["genre"] == "코믹":
-                amount = 30000
-                if cartoon_consumption_history["view_count"] > 20:
-                    amount += 10000 + 500 * (cartoon_consumption_history["view_count"] - 20)
-            else:
-                amount = 4000 * cartoon_consumption_history["view_count"]
-            point += max(cartoon_consumption_history["view_count"] - 30, 0)
-            if cartoon["genre"] == "소년만화":
-                point += math.floor(cartoon_consumption_history["view_count"] / 5)
+        for cartoon_consumption_history in order_history["cartoon_consumption_histories"]: #각 만화별 소비기록 for문
+            #amount가 0으로 선언한후에, 아래 로직에서 사용된 후 다시 return 되고 있다.
+            #굳이 여기서 선언될 필요없이, 아래 계산로직에 포함되도 무방하다.
+            #amount = 0 #각 만화별 비용 계산하기
+            # cartoon_id는 위 딕셔너리에서 사용되고있는, 유효한 key값
+            cartoon = cartoon_info[cartoon_consumption_history["cartoon_id"]]  #만화 정보 가져오기
+            amount = calculate_cost_of_comic(cartoon, cartoon_consumption_history)
+            point += max(cartoon_consumption_history["view_count"] - 30, 0) #포인트 계산하기
+            if cartoon["genre"] == "소년만화": # 만화 정보 가져오기 -> 나중에 포인트 계산
+                point += math.floor(cartoon_consumption_history["view_count"] / 5) #포인트 계산하기
 
-            result += f"{cartoon['name']} : {amount}원 {cartoon_consumption_history['view_count']} 권 대여 \n"
-            total_amount += amount
+            result += f"{cartoon['name']} : {amount}원 {cartoon_consumption_history['view_count']} 권 대여 \n" #출력결과 출력하기
+            total_amount += amount #총 비용 계산하기
 
-        result += f"총액 {total_amount}원 "
-        result += f"적립 포인트 {point}점\n \n"
+        result += f"총액 {total_amount}원 " #출력결과 출력하기
+        result += f"적립 포인트 {point}점\n \n" #출력결과 출력하기
     return result
+
+#기존 amount 매개변수를 받았지만, 내부에서 선언되어 amount 인자를 받을 필요가 없어졌다!
+def calculate_cost_of_comic(cartoon, cartoon_consumption_history):
+    amount = 0 #각 만화별 비용 계산하기
+    if cartoon["genre"] == "판타지":  # 장르확인 -> 나중에 만화 비용 계산
+        amount += 1000 * (cartoon_consumption_history["view_count"] - 30)  # 만화 비용 계산하기
+    elif cartoon["genre"] == "코믹":  # 장르확인 -> 나중에 만화 비용 계산
+        amount = 30000  # 만화 비용 계산하기
+        if cartoon_consumption_history["view_count"] > 20:  # 만화 비용 계산하기
+            amount += 10000 + 500 * (cartoon_consumption_history["view_count"] - 20)  # 만화 비용 계산하기
+    else:  # 장르확인 -> 나중에 만화 비용 계산
+        amount = 4000 * cartoon_consumption_history["view_count"]  # 만화 비용 계산하기
+    return amount
 
 
 result = get_result(input_order_histories, input_cartoon_info)
