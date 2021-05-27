@@ -1,5 +1,10 @@
-{% for question in question_list %}
-{{ question.question_text }}
-{% endfor %}
+{% if question_list %}
+<ul>
+   {% for question in question_list %}
+ <li> {{ question.question_text }} </li>
+   {% endfor %}
+</ul>
 
- {{ question_list }}
+{% else %}
+   <p>등록된 설문조사가 없습니다.</p>
+{% endif %}
