@@ -93,3 +93,51 @@ class QuesionIndexViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertQuerysetEqual(response.context['question_list'], [question2, question1])
+
+    def test_has_a_href_link(self):
+        """
+        Questions would be displayed with a href link
+        """
+        question = create_question("test", datetime.timedelta(days=-30))
+        response = self.client.get("/polls/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f'href="/polls/{question.id}/')
+
+class  QuestionDetailViewTests(TestCase):
+    def test_future_question(self):
+        """
+        questions in the future would return 404 not found page
+        """
+        future_question = create_question(question_text="test", time_delta_from_now=datetime.timedelta(days=5))
+        response = self.client.get(f"/polls/{future_question.id}/")
+        self.assertEqual(response.status_code, 404)
+
+    def test_past_question(self):
+        """
+        questions in the past would return each question_text
+        """
+        past_question = create_question(question_text="test", time_delta_from_now=datetime.timedelta(days=-5))
+        response = self.client.get(f"/polls/{past_question.id}/")
+
+    def test_past_question_with_choices(self):
+        """
+        question in the past would return the question's choice
+        """
+        past_question = create_question(question_text="test", time_delta_from_now=datetime.timedelta(days=-5))
+
+        choice1 = Choice(question=past_question, choice_text="choice 1")
+        choice1.save()
+        choice2 = Choice(question=past_question, choice_text="choice 2")
+        choice2.save()
+
+        response = self.client.get(f"/polls/{past_question.id}/")
+
+        self.assertContains(response, choice1.choice_text)
+        self.assertContains(response, choice2.choice_text)
+
+
+#1. 질문 리스트페이지에서 질문 개별 페이지로 이동할 수 있는 href 링크를 제공해야 합니다.
+#2. 현재 발행되지 않은 질문의 디테일 뷰에 접속했을 때 404 에러가 나와야 합니다.
+#3. 이미 발행된 질문에 접속하면 해당 질문의 내용이 존재해야 합니다.
+#4. 이미 발행된 질문에 접속하면 해당 질문에 대한 선택들 내용도 존재해야 합니다.
