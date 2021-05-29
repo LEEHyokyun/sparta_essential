@@ -3,7 +3,7 @@ from selenium import webdriver
 import unittest
 
 
-class Functioan_test_Django(unittest.TestCase):
+class FunctionalTest(unittest.TestCase):
     def setUp(self):
         path = './chromedriver'
         self.driver = webdriver.Chrome(path)
@@ -11,14 +11,19 @@ class Functioan_test_Django(unittest.TestCase):
     def tearDown(self):
         self.driver.quit()
 
-    def test_has_worked_in_title(self):
+    def test_go_to_question_detail_page(self):
+        self.driver.get("http://localhost:8000/polls/")
+        a_tag = self.driver.find_elements_by_tag_name("li > a")[1]
+        self.assertIn( "What's new?", a_tag.text)
 
-        self.driver.get('http://localhost:8000')
-        #assert "Django" in driver.title
-        self.assertIn("worked", self.driver.title)
+        a_tag.click()
+        self.assertEqual(self.driver.current_url, "http://localhost:8000/polls/1/")
+        self.assertIn(self.driver.find_element_by_tag_name("h1").text, "What's new?")
 
-    def test_has_installed_in_title(self):
-
-        self.driver.get('http://localhost:8000')
-        # assert "Django" in driver.title
-        self.assertIn("install", self.driver.title)
+        li_tags = self.driver.find_elements_by_tag_name("ul > li")
+        self.assertTrue(
+            any(li_tag.text == "choice!" for li_tag in li_tags)
+        )
+        self.assertTrue(
+            any(li_tag.text == "choice!" for li_tag in li_tags)
+        )
