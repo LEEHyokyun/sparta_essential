@@ -3,6 +3,16 @@ from django.utils import timezone
 from .models import Question, Choice
 import datetime
 
+def create_question(question_text, time_delta_from_now):
+    """
+    Create a question with parameters
+    """
+
+    time = timezone.now() + time_delta_from_now
+    question = Question(question_text = question_text, pub_date = time)
+    question.save()
+
+    return question
 
 # Create your tests here.
 class QuesionIndexViewTests(TestCase):
@@ -45,10 +55,7 @@ class QuesionIndexViewTests(TestCase):
         with <New> marked
         """
 
-        recent_time = timezone.now() - datetime.timedelta(hours=8)
-        question = Question(question_text="test", pub_date=recent_time)
-        question.save()
-
+        question = create_question("test", datetime.timedelta(hours=-8))
         response = self.client.get("/polls/")
 
         self.assertEqual(response.status_code, 200)
@@ -59,10 +66,7 @@ class QuesionIndexViewTests(TestCase):
         """
         Questions in the past would be displayed
         """
-        past_time = timezone.now() + datetime.timedelta(days=-30)
-        question = Question(question_text = "test", pub_date = past_time)
-        question.save()
-
+        question = create_question("test", datetime.timedelta(days=-30))
         response = self.client.get("/polls/")
 
         self.assertEqual(response.status_code, 200)
@@ -72,10 +76,7 @@ class QuesionIndexViewTests(TestCase):
         """
         Questions in the past would be displayed
         """
-        past_time = timezone.now() + datetime.timedelta(days=-30)
-        question = Question(question_text = "test", pub_date = past_time)
-        question.save()
-
+        question = create_question("test", datetime.timedelta(days=30))
         response = self.client.get("/polls/")
 
         self.assertEqual(response.status_code, 200)
@@ -86,14 +87,8 @@ class QuesionIndexViewTests(TestCase):
         """
         Questions would be displayed with sorted by pub_date
         """
-        much_past_time = timezone.now() - datetime.timedelta(days=30)
-        question1 = Question(question_text = "test", pub_date = much_past_time)
-        question1.save()
-
-        past_time = timezone.now() - datetime.timedelta(days=5)
-        question2 = Question(question_text="test", pub_date=past_time)
-        question2.save()
-
+        question1 = create_question("test", datetime.timedelta(days=-30))
+        question2 = create_question("test", datetime.timedelta(days=-5))
         response = self.client.get("/polls/")
 
         self.assertEqual(response.status_code, 200)
